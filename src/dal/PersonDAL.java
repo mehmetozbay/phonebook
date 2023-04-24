@@ -46,7 +46,6 @@ public class PersonDAL extends CoreHelper implements DALInterfaces<Person> {
 	@Override
 	public List<Person> getAll() throws SQLException {
 		ArrayList<Person> list = new ArrayList<>();
-
 		connection = getConnection();
 		statement = connection.createStatement();
 		String query = "SELECT * FROM iletisim";
@@ -57,12 +56,12 @@ public class PersonDAL extends CoreHelper implements DALInterfaces<Person> {
 				person = new Person(rs.getInt("id"), rs.getString("ad"), rs.getString("soyad"), rs.getString("tel"),
 						rs.getString("email"), rs.getString("adres"));
 				list.add(person);
-				
+
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			connection.close();
 			statement.close();
 			rs.close();
@@ -72,35 +71,71 @@ public class PersonDAL extends CoreHelper implements DALInterfaces<Person> {
 
 	@Override
 	public boolean delete(int id) throws SQLException {
-		
+
 		connection = getConnection();
 		statement = connection.createStatement();
-		String query="DELETE FROM iletisim WHERE id="+id;
-		
+		String query = "DELETE FROM iletisim WHERE id=" + id;
+
 		try {
 			statement.executeUpdate(query);
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
-		}finally {
+		} finally {
 			connection.close();
 			statement.close();
 		}
-		
-		
+
 	}
 
 	@Override
 	public boolean update(Person entity) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		connection = getConnection();
+		statement = connection.createStatement();
+		String query = "UPDATE iletisim SET ad='" + entity.getAd() + "', soyad='" + entity.getSoyad() + "', tel='"
+				+ entity.getTel() + "', email='" + entity.getEmail() + "', adres='" + entity.getAdres() + "' WHERE id="
+				+ entity.getId();
+		try {
+			statement.executeUpdate(query);
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			connection.close();
+			statement.close();
+		}
 	}
 
 	@Override
 	public List<Person> getBySearch(String search) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+
+		ArrayList<Person> list = new ArrayList<>();
+		connection = getConnection();
+		statement = connection.createStatement();
+		String query = "SELECT * FROM iletisim WHERE LOWER(ad) like '%" + search.toLowerCase()
+				+ "%' or LOWER(soyad) like '%" + search.toLowerCase() + "%' or tel like '%" + search
+				+ "%' or LOWER(email) like '%" + search.toLowerCase() + "%' or LOWER(ad) like '%" + search.toLowerCase()
+				+ "%'";
+		Person person;
+		try {
+			rs = statement.executeQuery(query);
+			while (rs.next()) {
+				person = new Person(rs.getInt("id"), rs.getString("ad"), rs.getString("soyad"), rs.getString("tel"),
+						rs.getString("email"), rs.getString("adres"));
+				list.add(person);
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			connection.close();
+			statement.close();
+			rs.close();
+		}
+		return list;
 	}
 
 }
